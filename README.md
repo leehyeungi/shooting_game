@@ -1,12 +1,13 @@
-# shooting_game
 import pygame
 import random
+
+from pygame.sprite import Sprite
 
 pygame.init()
 
 # 게임 화면 설정
-
-size = (740, 986)
+image_list = ['backgroundse.ppg','backgroundse1.png']
+size = (400, 500)
 screen = pygame.display.set_mode(size)
 pygame.display.set_caption("슈팅 게임")
 
@@ -19,6 +20,27 @@ class GameObject(pygame.sprite.Sprite):
         self.rect.centerx = x
         self.rect.centery = y
 
+
+#배경화면 클래스
+class Background(Sprite):
+    def __init__(self):
+        self.count = 0
+        self.sprite_image = list[0]
+        self.image = pygame.image.load(self.sprite_image).convert()
+        self.rect = self.image.get_rect()
+        self.rect.y = 0
+        self.dy = 1
+
+    def update(self):
+        self.rect.y -= self.dy
+        if self.rect.y == -400:
+            self.rect.y = 0
+            self.count += 1
+
+    if self.count == 5:
+        self.count = 0
+        #리스트 값을 변경해주기
+        
 # 플레이어 클래스
 class Player(GameObject):
     def __init__(self, image, x, y):
@@ -41,12 +63,12 @@ class Player(GameObject):
         # 화면을 벗어나지 않도록 위치 조정
         if self.rect.left < 0:
             self.rect.left = 0
-        elif self.rect.right > 600:
-            self.rect.right = 600
+        elif self.rect.right > 400:
+            self.rect.right = 400
         if self.rect.top < 0:
             self.rect.top = 0
-        elif self.rect.bottom > 800:
-            self.rect.bottom = 800
+        elif self.rect.bottom > 500:
+            self.rect.bottom = 500
 
     def shoot(self):
         # 총알 객체 생성
@@ -62,7 +84,7 @@ class Enemy(GameObject):
 
     def update(self):
         self.rect.y += self.speed
-        if self.rect.top > 800:
+        if self.rect.top > 500:
             self.kill()
 
 # 총알 클래스
@@ -84,7 +106,6 @@ class Bullet(pygame.sprite.Sprite):
             self.kill()
 
 # 이미지 로드
-background_img = pygame.image.load('backgrounds.png').convert_alpha() #배경화면 이미지
 player_img = pygame.image.load('players.png').convert_alpha() #플레이어 이미지
 enemy_img = pygame.image.load('enemys.png').convert_alpha() #적 이미지
 bullet_img = pygame.image.load('stones.png').convert_alpha() #총알 이미지
@@ -104,6 +125,11 @@ for i in range(10):
 # 게임 루프
 running = True
 clock = pygame.time.Clock()
+
+if running == True:
+    background = Background()
+    background_group = pygame.sprite.Group()
+    background_group.add(background)
 
 while running:
     # 이벤트 처리
@@ -130,8 +156,8 @@ while running:
         running = False
 
     # 화면 그리기
-    screen.fill((255, 255, 255))
-    all_sprites.draw(screen)
+    background_group.update()
+    background_group.draw(screen)
 
     # 점수 출력
     font = pygame.font.Font(None, 30)
